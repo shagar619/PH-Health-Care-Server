@@ -1,0 +1,36 @@
+{
+  "name": "ph-health-care-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Shagar",
+  "license": "MIT",
+  "scripts": {
+    "start": "node ./dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "build": "tsc",
+    "lint": "npx eslint ./src"
+  },
+  "description": "",
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@prisma/client": "^6.19.0",
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
+    "eslint": "^9.39.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "http-status": "^2.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.4",
+    "prisma": "^6.19.0",
+    "zod": "^4.1.12"
+  }
+}

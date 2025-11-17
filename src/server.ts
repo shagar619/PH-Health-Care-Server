@@ -17,7 +17,7 @@ async function bootstrap() {
           const exitHandler = () => {
           if (server) {
                server.close(() => {
-                    console.log('Server closed gracefully.');
+                    console.log('Server closed gracefully!');
                     process.exit(1); // Exit with a failure code
                });
           } else {
@@ -27,7 +27,7 @@ async function bootstrap() {
 
           // Handle unhandled promise rejections
           process.on('unhandledRejection', (error) => {
-          console.log('Unhandled Rejection is detected, we are closing our server...');
+          console.log('Unhandled Rejection is detected, we are closing our server..!');
           if (server) {
                server.close(() => {
                console.log(error);

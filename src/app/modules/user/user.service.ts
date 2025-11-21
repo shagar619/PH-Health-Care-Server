@@ -14,7 +14,7 @@ const createPatient = async (payload: createPatientInput) => {
                }
           });
 
-          await tnx.patient.create({
+          return await tnx.patient.create({
                data: {
                     name: payload.name,
                     email: payload.email,

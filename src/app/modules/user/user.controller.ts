@@ -7,7 +7,7 @@ import StatusCodes from "http-status-codes";
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
 
-     const result = await UserService.createPatient(req.body);
+     const result = await UserService.createPatient(req);
 
      sendResponse(res, {
           statusCode: StatusCodes.CREATED,

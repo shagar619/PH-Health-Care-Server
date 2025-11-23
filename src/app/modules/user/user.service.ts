@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import bcrypt from "bcryptjs";
 import { prisma } from "../../shared/prisma";
 import { Request } from "express";
 import { fileUploader } from "../../helper/fileUploader";
-import { Admin, Doctor, UserRole } from "@prisma/client";
+import { Admin, Doctor, Prisma, UserRole } from "@prisma/client";
+import { IOptions, paginationHelper } from "../../helper/paginationHelper";
+import { userSearchableFields } from "./user.constant";
 
 const createPatient = async (req: Request) => {
 
@@ -107,11 +110,60 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
 
 
 
-const getAllFromDB = async () => {
+const getAllFromDB = async (params: any, options: IOptions) => {
 
-     const result = await prisma.user.findMany();
+     const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options)
 
-     return result;
+     const { searchTerm, ...filterData } = params;
+
+     const andConditions: Prisma.UserWhereInput[] = [];
+
+     if (searchTerm) {
+     andConditions.push({
+          OR: userSearchableFields.map(field => ({
+               [field]: {
+                    contains: searchTerm,
+                    mode: "insensitive"
+               }
+          }))
+     })
+     }
+
+     if (Object.keys(filterData).length > 0) {
+     andConditions.push({
+          AND: Object.keys(filterData).map(key => ({
+               [key]: {
+                    equals: (filterData as any)[key]
+               }
+          }))
+     })
+     }
+
+     const whereConditions: Prisma.UserWhereInput = andConditions.length > 0 ? {
+     AND: andConditions
+     } : {}
+
+     const result = await prisma.user.findMany({
+          skip,
+          take: limit,
+          where: whereConditions,
+          orderBy: {
+               [sortBy]: sortOrder
+          }
+     });
+
+     const total = await prisma.user.count({
+          where: whereConditions
+     });
+
+     return {
+     meta: {
+          page,
+          limit,
+          total
+     },
+     data: result
+     };
 }
 
 

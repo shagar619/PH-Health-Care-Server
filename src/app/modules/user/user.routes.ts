@@ -8,6 +8,12 @@ import auth from "../../middlewares/auth";
 
 const router = Router();
 
+router.get(
+     '/',
+     // auth(UserRole.ADMIN),
+     UserController.getAllFromDB
+);
+
 router.post(
      '/create-patient',
      fileUploader.upload.single("file"),

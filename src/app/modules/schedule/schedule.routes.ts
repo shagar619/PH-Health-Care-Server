@@ -4,11 +4,11 @@ import { ScheduleController } from "./schedule.controller";
 
 const router = Router();
 
-// router.get(
-//      "/",
-//      auth(UserRole.DOCTOR, UserRole.DOCTOR),
-//      ScheduleController.schedulesForDoctor
-// )
+router.get(
+     "/",
+     // auth(UserRole.DOCTOR, UserRole.DOCTOR),
+     ScheduleController.schedulesForDoctor
+)
 
 router.post(
      "/",

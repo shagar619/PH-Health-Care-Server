@@ -1,3 +1,5 @@
+
+
 model Schedule {
      id              String            @id @default(uuid())
      startDateTime   DateTime

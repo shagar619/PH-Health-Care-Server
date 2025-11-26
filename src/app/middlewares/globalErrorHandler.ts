@@ -82,7 +82,7 @@ const globalErrorHandler = (
           }
      }
 
-          /**
+     /**
      * -------------------------
      *  Prisma unknown Errors
      * -------------------------
@@ -93,7 +93,7 @@ const globalErrorHandler = (
           errors.push({ message: err.message });
      }
 
-          /**
+     /**
      * -------------------------
      *  Prisma Initialization Error
      * -------------------------

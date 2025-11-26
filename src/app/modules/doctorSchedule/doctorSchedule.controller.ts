@@ -20,6 +20,7 @@ const insertIntoDB = catchAsync(async (req: Request & { user?: IJWTPayload }, re
 });
 
 
+
 export const DoctorScheduleController = {
      insertIntoDB,
 }

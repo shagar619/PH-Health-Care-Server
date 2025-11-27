@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express"
 import { jwtHelper } from "../helper/jwtHelper";
+import StatusCode from "http-status-codes";
+import ApiError from "../errors/ApiError";
+
+
 
 const auth = (...roles: string[]) => {
 
@@ -10,7 +14,7 @@ const auth = (...roles: string[]) => {
      const token = req.cookies.accessToken;
 
      if (!token) {
-          throw new Error("You are not authorized!")
+          throw new ApiError(StatusCode.UNAUTHORIZED, "You are not logged in!");
      }
 
      const verifyUser = jwtHelper.verifyToken(token, "abcd");
@@ -18,7 +22,7 @@ const auth = (...roles: string[]) => {
      req.user = verifyUser;
 
      if (roles.length && !roles.includes(verifyUser.role)) {
-          throw new Error("You are not authorized!")
+          throw new ApiError(StatusCode.FORBIDDEN, "You are not authorized!");
      }
 
           next();

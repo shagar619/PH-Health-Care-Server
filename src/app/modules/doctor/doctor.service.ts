@@ -119,7 +119,6 @@ const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
                }
                })
           }
-
      }
 
      const updatedData = await tnx.doctor.update({
@@ -135,7 +134,8 @@ const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
                }
           }
 
-            //  doctor - doctorSpecilties - specialities 
+          // work flow
+          //  doctor - doctorSpecilties - specialities 
      })
 
      return updatedData

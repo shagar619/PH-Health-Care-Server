@@ -9,6 +9,7 @@ import { doctorSearchableFields } from "./doctor.constant";
 const getAllFromDB = async (filters: any, options: IOptions) => {
 
      const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options);
+
      const { searchTerm, specialties, ...filterData } = filters;
 
      const andConditions: Prisma.DoctorWhereInput[] = [];
@@ -134,7 +135,7 @@ const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
                }
           }
 
-            //  doctor - doctorSpecailties - specialities 
+            //  doctor - doctorSpecilties - specialities 
      })
 
      return updatedData

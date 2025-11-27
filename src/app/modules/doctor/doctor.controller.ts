@@ -4,6 +4,7 @@ import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import { doctorFilterableFields } from "./doctor.constant";
 import { DoctorService } from "./doctor.service";
+import StatusCode from "http-status-codes";
 
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
@@ -14,7 +15,7 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
      const result = await DoctorService.getAllFromDB(filters, options);
 
      sendResponse(res, {
-          statusCode: 200,
+          statusCode: StatusCode.OK,
           success: true,
           message: "Doctor fetched successfully!",
           meta: result.meta,
@@ -29,7 +30,7 @@ const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
      const result = await DoctorService.updateIntoDB(id, req.body);
 
      sendResponse(res, {
-          statusCode: 200,
+          statusCode: StatusCode.OK,
           success: true,
           message: "Doctor updated successfully!",
           data: result

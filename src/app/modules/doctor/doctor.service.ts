@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Doctor, Prisma } from "@prisma/client";
+import { Doctor, Prisma, UserStatus } from "@prisma/client";
 import { prisma } from "../../shared/prisma";
 import { IDoctorUpdateInput } from "./doctor.interface";
 import { IOptions, paginationHelper } from "../../helper/paginationHelper";
@@ -199,6 +199,33 @@ const deleteFromDB = async (id: string): Promise<Doctor> => {
 
 
 
+const softDelete = async (id: string): Promise<Doctor> => {
+
+     return await prisma.$transaction(async (transactionClient) => {
+
+     const deleteDoctor = await transactionClient.doctor.update({
+     where: { id },
+          data: {
+               isDeleted: true,
+          },
+     });
+
+     await transactionClient.user.update({
+     where: {
+          email: deleteDoctor.email,
+     },
+          data: {
+               status: UserStatus.DELETED,
+          },
+     });
+
+     return deleteDoctor;
+});
+};
+
+
+
+
 
 
 // Implementing AI-Driven Doctor Suggestion
@@ -262,5 +289,6 @@ export const DoctorService = {
      updateIntoDB,
      getAISuggestions,
      getByIdFromDB,
-     deleteFromDB
+     deleteFromDB,
+     softDelete
 }

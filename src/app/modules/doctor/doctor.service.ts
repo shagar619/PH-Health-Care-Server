@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Prisma } from "@prisma/client";
+import { Doctor, Prisma } from "@prisma/client";
 import { prisma } from "../../shared/prisma";
 import { IDoctorUpdateInput } from "./doctor.interface";
 import { IOptions, paginationHelper } from "../../helper/paginationHelper";
@@ -144,8 +144,36 @@ const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
 
      return updatedData
 })
-
 }
+
+
+
+
+const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
+
+     const result = await prisma.doctor.findUnique({
+     where: {
+          id,
+          isDeleted: false,
+     },
+     include: {
+          doctorSpecialties: {
+               include: {
+                    specialities: true,
+               },
+          },
+          doctorSchedules: {
+               include: {
+                    schedule: true
+               }
+          }
+     },
+});
+     return result;
+};
+
+
+
 
 
 
@@ -208,5 +236,6 @@ const getAISuggestions = async (payload: { symptoms: string }) => {
 export const DoctorService = {
      getAllFromDB,
      updateIntoDB,
-     getAISuggestions
+     getAISuggestions,
+     getByIdFromDB
 }

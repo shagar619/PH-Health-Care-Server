@@ -176,6 +176,30 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
 
 
 
+const deleteFromDB = async (id: string): Promise<Doctor> => {
+
+     return await prisma.$transaction(async (transactionClient) => {
+
+     const deleteDoctor = await transactionClient.doctor.delete({
+     where: {
+          id,
+     },
+     });
+
+     await transactionClient.user.delete({
+     where: {
+               email: deleteDoctor.email,
+          },
+     });
+
+     return deleteDoctor;
+});
+};
+
+
+
+
+
 
 // Implementing AI-Driven Doctor Suggestion
 const getAISuggestions = async (payload: { symptoms: string }) => {
@@ -237,5 +261,6 @@ export const DoctorService = {
      getAllFromDB,
      updateIntoDB,
      getAISuggestions,
-     getByIdFromDB
+     getByIdFromDB,
+     deleteFromDB
 }

@@ -7,6 +7,7 @@ import { doctorSearchableFields } from "./doctor.constant";
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../../errors/ApiError";
 import { openai } from "../../helper/open-router";
+import { extractJsonFromMessage } from "../../helper/extractJsonFromMessage";
 
 
 
@@ -277,8 +278,9 @@ const getAISuggestions = async (payload: { symptoms: string }) => {
      ],
 });
 
+     const result = await extractJsonFromMessage(completion.choices[0].message);
 
-
+     return result;
 }
 
 

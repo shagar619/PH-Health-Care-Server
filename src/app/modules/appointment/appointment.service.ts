@@ -18,6 +18,7 @@ const createAppointment = async (user: IJWTPayload, payload: { doctorId: string,
           }
      });
 
+     // eslint-disable-next-line @typescript-eslint/no-unused-vars
      const isBookedOrNot = await prisma.doctorSchedules.findFirstOrThrow({
           where: {
                doctorId: payload.doctorId,
@@ -50,9 +51,21 @@ const createAppointment = async (user: IJWTPayload, payload: { doctorId: string,
                     isBooked: true
                }
           })
+
+          const transactionId = uuidv4();
+
+          await tnx.payment.create({
+               data: {
+                    appointmentId: appointmentData.id,
+                    amount: doctorData.appointmentFee,
+                    transactionId
+               }
+          })
+
+          return appointmentData
      })
 
-
+     return result;
 }
 
 

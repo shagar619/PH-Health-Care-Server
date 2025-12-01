@@ -28,6 +28,29 @@ const createAppointment = async (user: IJWTPayload, payload: { doctorId: string,
 
      const videoCallingId = uuidv4();
 
+     const result = await prisma.$transaction(async (tnx) => {
+
+          const appointmentData = await tnx.appointment.create({
+               data: {
+                    patientId: patientData.id,
+                    doctorId: doctorData.id,
+                    scheduleId: payload.scheduleId,
+                    videoCallingId
+               }
+          })
+
+          await tnx.doctorSchedules.update({
+               where: {
+                    doctorId_scheduleId: {
+                         doctorId: doctorData.id,
+                         scheduleId: payload.scheduleId
+                    }
+               },
+               data: {
+                    isBooked: true
+               }
+          })
+     })
 
 
 }

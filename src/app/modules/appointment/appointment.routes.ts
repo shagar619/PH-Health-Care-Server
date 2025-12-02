@@ -19,11 +19,11 @@ router.post(
 )
 
 
-// router.patch(
-//      "/status/:id",
-//      auth(UserRole.ADMIN, UserRole.DOCTOR),
-//      AppointmentController.updateAppointmentStatus
-// )
+router.patch(
+     "/status/:id",
+     auth(UserRole.ADMIN, UserRole.DOCTOR),
+     AppointmentController.updateAppointmentStatus
+)
 
 
 export const AppointmentRoutes = router;

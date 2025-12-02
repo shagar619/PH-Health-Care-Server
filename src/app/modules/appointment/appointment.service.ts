@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Prisma, UserRole } from "@prisma/client";
+import { AppointmentStatus, Prisma, UserRole } from "@prisma/client";
 import { stripe } from "../../helper/stripe";
 import { prisma } from "../../shared/prisma";
 import { IJWTPayload } from "../../types/common";
 import { v4 as uuidv4 } from 'uuid';
 import { IOptions, paginationHelper } from "../../helper/paginationHelper";
+import ApiError from "../../errors/ApiError";
+import StatusCode from "http-status-codes";
 
 
 const createAppointment = async (user: IJWTPayload, payload: { doctorId: string, scheduleId: string }) => {
@@ -161,7 +163,39 @@ const getMyAppointment = async (user: IJWTPayload, filters: any, options: IOptio
 
 
 
+
+
+const updateAppointmentStatus = async (appointmentId: string, status: AppointmentStatus, user: IJWTPayload) => {
+
+     const appointmentData = await prisma.appointment.findUniqueOrThrow({
+     where: {
+          id: appointmentId
+     },
+     include: {
+          doctor: true
+     }
+     });
+
+     if (user.role === UserRole.DOCTOR) {
+
+     if (!(user.email === appointmentData.doctor.email))
+          throw new ApiError(StatusCode.BAD_REQUEST, "This is not your appointment")
+     }
+
+     return await prisma.appointment.update({
+     where: {
+          id: appointmentId
+     },
+     data: {
+          status
+     }
+     })
+}
+
+
+
 export const AppointmentService = {
      createAppointment,
-     getMyAppointment
+     getMyAppointment,
+     updateAppointmentStatus
 };

@@ -89,9 +89,8 @@ const createAppointment = async (user: IJWTPayload, payload: { doctorId: string,
                cancel_url: `https://x.com/619_shagar`
           });
 
-          // return { paymentUrl: session.url };
-          console.log(session);
-     })
+          return { paymentUrl: session.url };
+     });
 
      return result;
 }

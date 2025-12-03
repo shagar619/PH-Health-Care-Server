@@ -4,6 +4,7 @@ import { IJWTPayload } from "../../types/common";
 import sendResponse from "../../shared/sendResponse";
 import StatusCode from "http-status-codes";
 import { PrescriptionService } from "./prescription.service";
+import pick from "../../helper/pick";
 
 
 const createPrescription = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
@@ -17,8 +18,27 @@ const createPrescription = catchAsync(async (req: Request & { user?: IJWTPayload
           message: "prescription created successfully!",
           data: result
      })
-})
+});
+
+
+
+const patientPrescription = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
+
+     const user = req.user;
+     const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder'])
+     const result = await PrescriptionService.patientPrescription(user as IJWTPayload, options);
+
+     sendResponse(res, {
+          statusCode: StatusCode.OK,
+          success: true,
+          message: 'Prescription fetched successfully',
+          meta: result.meta,
+          data: result.data
+     });
+});
+
 
 export const PrescriptionController = {
-     createPrescription
+     createPrescription,
+     patientPrescription
 }

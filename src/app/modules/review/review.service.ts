@@ -40,7 +40,7 @@ const insertIntoDB = async (user: IJWTPayload, payload: any) => {
           where: {
                doctorId: appointmentData.doctorId
           }
-     })
+     });
 
      await tnx.doctor.update({
           where: {
@@ -49,7 +49,7 @@ const insertIntoDB = async (user: IJWTPayload, payload: any) => {
           data: {
                averageRating: avgRating._avg.rating as number
           }
-     })
+     });
 
      return result;
      })

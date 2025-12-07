@@ -54,6 +54,7 @@ const updateIntoDB = catchAsync(async (req: Request & { user?: IJWTPayload }, re
 
      const user = req.user;
      const result = await PatientService.updateIntoDB(user as IJWTPayload, req.body);
+     
      sendResponse(res, {
           statusCode: StatusCode.OK,
           success: true,

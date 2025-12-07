@@ -5,6 +5,7 @@ import { patientFilterableFields } from "./patient.constant";
 import sendResponse from "../../shared/sendResponse";
 import { IJWTPayload } from "../../types/common";
 import StatusCode from "http-status-codes";
+import { PatientService } from "./patient.service";
 
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {

@@ -147,6 +147,7 @@ const forgotPassword = async (payload: { email: string }) => {
 
 const resetPassword = async (token: string, payload: { id: string, password: string }) => {
 
+     // eslint-disable-next-line @typescript-eslint/no-unused-vars
      const userData = await prisma.user.findUniqueOrThrow({
      where: {
           id: payload.id,

@@ -85,5 +85,6 @@ export const UserController = {
      createPatient,
      createAdmin,
      createDoctor,
-     getAllFromDB
+     getAllFromDB,
+     getMyProfile
 }

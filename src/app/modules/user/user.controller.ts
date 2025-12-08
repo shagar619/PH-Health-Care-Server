@@ -5,6 +5,7 @@ import { UserService } from "./user.service";
 import StatusCodes from "http-status-codes";
 import pick from "../../helper/pick";
 import { userFilterableFields } from "./user.constant";
+import { IJWTPayload } from "../../types/common";
 
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
@@ -63,9 +64,44 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+
+const getMyProfile = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
+
+     const user = req.user;
+
+     const result = await UserService.getMyProfile(user as IJWTPayload);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: "My profile data fetched!",
+          data: result
+     })
+});
+
+
+
+const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
+
+     const { id } = req.params;
+
+     const result = await UserService.changeProfileStatus(id, req.body)
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: "Users profile status changed!",
+          data: result
+     });
+});
+
+
+
 export const UserController = {
      createPatient,
      createAdmin,
      createDoctor,
-     getAllFromDB
+     getAllFromDB,
+     getMyProfile,
+     changeProfileStatus
 }

@@ -3,6 +3,8 @@ import { NextFunction, Request, Response } from "express"
 import { jwtHelper } from "../helper/jwtHelper";
 import StatusCode from "http-status-codes";
 import ApiError from "../errors/ApiError";
+import config from "../../config";
+import { Secret } from "jsonwebtoken";
 
 
 
@@ -17,7 +19,7 @@ const auth = (...roles: string[]) => {
           throw new ApiError(StatusCode.UNAUTHORIZED, "You are not logged in!");
      }
 
-     const verifyUser = jwtHelper.verifyToken(token, "abcd");
+     const verifyUser = jwtHelper.verifyToken(token, config.jwt.jwt_secret as Secret);
 
      req.user = verifyUser;
 

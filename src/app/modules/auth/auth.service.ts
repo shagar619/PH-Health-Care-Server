@@ -7,6 +7,7 @@ import StatusCode from "http-status-codes";
 import ApiError from "../../errors/ApiError";
 import config from "../../../config";
 import { Secret } from "jsonwebtoken";
+import emailSender from "./emailSender";
 
 
 

@@ -65,7 +65,7 @@ const patientPrescription = async (user: IJWTPayload, options: IOptions) => {
           patient: true,
           appointment: true
      }
-     })
+     });
 
      const total = await prisma.prescription.count({
      where: {
@@ -73,7 +73,7 @@ const patientPrescription = async (user: IJWTPayload, options: IOptions) => {
                email: user.email
           }
      }
-     })
+     });
 
      return {
      meta: {

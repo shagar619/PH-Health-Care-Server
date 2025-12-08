@@ -25,7 +25,9 @@ const createPrescription = catchAsync(async (req: Request & { user?: IJWTPayload
 const patientPrescription = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
 
      const user = req.user;
-     const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder'])
+
+     const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+
      const result = await PrescriptionService.patientPrescription(user as IJWTPayload, options);
 
      sendResponse(res, {

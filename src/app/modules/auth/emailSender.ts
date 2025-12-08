@@ -22,13 +22,12 @@ const emailSender = async (
 
      // eslint-disable-next-line @typescript-eslint/no-unused-vars
      const info = await transporter.sendMail({
-        from: '"PH Health Care" <shafayat.ph@gmail.com>', // sender address
+        from: '"PH Health Care" <ashagar619@gmail.com>', // sender address
         to: email, // list of receivers
         subject: "Reset Password Link", // Subject line
         //text: "Hello world?", // plain text body
         html, // html body
      });
-
 }
 
 export default emailSender;

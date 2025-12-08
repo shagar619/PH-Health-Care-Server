@@ -26,9 +26,9 @@ const login = async (payload: { email: string, password: string }) => {
           throw new ApiError(StatusCode.UNAUTHORIZED, "Invalid login credentials");
      }
 
-     const accessToken = jwtHelper.generateToken({ email: user.email, role: user.role }, "abcd", "30d");
+     const accessToken = jwtHelper.generateToken({ email: user.email, role: user.role }, config.jwt.jwt_secret as Secret, config.jwt.expires_in as string);
 
-     const refreshToken = jwtHelper.generateToken({ email: user.email, role: user.role }, "abcdefgh", "90d");
+     const refreshToken = jwtHelper.generateToken({ email: user.email, role: user.role }, config.jwt.refresh_token_secret as Secret, config.jwt.refresh_token_expires_in as string);
 
      return {
           accessToken,
@@ -182,6 +182,7 @@ const resetPassword = async (token: string, payload: { id: string, password: str
 const getMe = async (session: any) => {
 
      const accessToken = session.accessToken;
+
      const decodedData = jwtHelper.verifyToken(accessToken, config.jwt.jwt_secret as Secret);
 
      const userData = await prisma.user.findUniqueOrThrow({
@@ -191,14 +192,16 @@ const getMe = async (session: any) => {
      }
      })
 
-     const { id, email, role, needPasswordChange, status } = userData;
+     const { id, email, role, needPasswordChange, status, createdAt, updatedAt } = userData;
 
      return {
           id,
           email,
           role,
           needPasswordChange,
-          status
+          status,
+          createdAt,
+          updatedAt
      }
 }
 

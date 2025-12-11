@@ -8,6 +8,7 @@ import StatusCode from "http-status-codes";
 const fetchDashboardMetaData = async (user: IJWTPayload) => {
 
      let metadata;
+
      switch (user.role) {
           case UserRole.ADMIN:
                metadata = await getAdminMetaData();
@@ -21,12 +22,12 @@ const fetchDashboardMetaData = async (user: IJWTPayload) => {
           default:
                throw new ApiError(StatusCode.BAD_REQUEST, "Invalid user role!")
      }
-
      return metadata;
 };
 
 
 const getDoctorMetaData = async (user: IJWTPayload) => {
+     
      const doctorData = await prisma.doctor.findUniqueOrThrow({
      where: {
           email: user?.email
@@ -86,7 +87,10 @@ const getDoctorMetaData = async (user: IJWTPayload) => {
      }
 }
 
-     const getPatientMetaData = async (user: IJWTPayload) => {
+
+
+const getPatientMetaData = async (user: IJWTPayload) => {
+
      const patientData = await prisma.patient.findUniqueOrThrow({
      where: {
           email: user?.email
@@ -148,7 +152,7 @@ const getAdminMetaData = async () => {
      where: {
           status: PaymentStatus.PAID
      }
-     })
+     });
 
      const barChartData = await getBarChartData();
      const pieChartData = await getPieChartData();
@@ -166,6 +170,7 @@ const getAdminMetaData = async () => {
 }
 
 
+
 const getBarChartData = async () => {
 
      const appointmentCountPerMonth = await prisma.$queryRaw`
@@ -177,6 +182,8 @@ const getBarChartData = async () => {
 
      return appointmentCountPerMonth
 }
+
+
 
 const getPieChartData = async () => {
 

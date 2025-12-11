@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync";
 import sendResponse from "../../shared/sendResponse";
 import { IJWTPayload } from "../../types/common";
 import StatusCode from "http-status-codes";
+import { MetaService } from "./meta.service";
 
 
 const fetchDashboardMetaData = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {

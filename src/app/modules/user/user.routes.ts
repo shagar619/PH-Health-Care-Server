@@ -31,6 +31,7 @@ router.post(
 }
 );
 
+
 router.post(
      "/create-admin",
      auth(UserRole.ADMIN),
@@ -52,7 +53,6 @@ router.post(
      return UserController.createDoctor(req, res, next)
 }
 );
-
 
 
 router.patch(

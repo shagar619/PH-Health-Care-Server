@@ -90,7 +90,7 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
      sendResponse(res, {
           statusCode: StatusCodes.OK,
           success: true,
-          message: "Users profile status changed!",
+          message: "Users profile status is changed!",
           data: result
      });
 });
@@ -106,7 +106,7 @@ const updateMyProfile = catchAsync(async (req: Request & { user?: IJWTPayload },
      sendResponse(res, {
           statusCode: StatusCodes.OK,
           success: true,
-          message: "My profile updated!",
+          message: "My profile is updated!",
           data: result
      });
 });

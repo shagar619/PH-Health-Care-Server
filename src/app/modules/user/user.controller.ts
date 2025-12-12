@@ -27,7 +27,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
      sendResponse(res, {
           statusCode: StatusCodes.CREATED,
           success: true,
-          message: "Admin Created successfuly!",
+          message: "Admin Created successfully!",
           data: result
      })
 });
@@ -90,7 +90,23 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
      sendResponse(res, {
           statusCode: StatusCodes.OK,
           success: true,
-          message: "Users profile status changed!",
+          message: "Users profile status is changed!",
+          data: result
+     });
+});
+
+
+
+const updateMyProfile = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
+
+     const user = req.user;
+
+     const result = await UserService.updateMyProfile(user as IJWTPayload, req);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: "My profile is updated!",
           data: result
      });
 });
@@ -103,5 +119,6 @@ export const UserController = {
      createDoctor,
      getAllFromDB,
      getMyProfile,
-     changeProfileStatus
+     changeProfileStatus,
+     updateMyProfile
 }

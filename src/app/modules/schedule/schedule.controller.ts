@@ -5,6 +5,7 @@ import { ScheduleService } from "./schedule.service";
 import StatusCodes from "http-status-codes";
 import pick from "../../helper/pick";
 import { IJWTPayload } from "../../types/common";
+import { IAuthUser } from "../../interfaces/common";
 
 
 const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
@@ -18,6 +19,42 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
           data: result
      })
 });
+
+
+const getAllFromDB = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
+
+     const filters = pick(req.query, ['startDate', 'endDate']);
+
+     const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+
+     const user = req.user;
+
+     const result = await ScheduleService.getAllFromDB(filters, options, user as IAuthUser);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: "Schedule fetched successfully!",
+          data: result.data,
+          meta: result.meta
+     });
+});
+
+
+
+const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
+
+     const { id } = req.params;
+     const result = await ScheduleService.getByIdFromDB(id);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: 'Schedule retrieval successfully',
+          data: result,
+     });
+});
+
 
 
 const schedulesForDoctor = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
@@ -63,5 +100,7 @@ const deleteScheduleFromDB = catchAsync(async (req: Request, res: Response) => {
 export const ScheduleController = {
      insertIntoDB,
      schedulesForDoctor,
-     deleteScheduleFromDB
+     deleteScheduleFromDB,
+     getByIdFromDB,
+     getAllFromDB
 }

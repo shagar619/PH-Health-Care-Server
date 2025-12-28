@@ -3,6 +3,7 @@ import catchAsync from "../../shared/catchAsync";
 import StatusCode from "http-status-codes";
 import sendResponse from "../../shared/sendResponse";
 import { SpecialtiesService } from "./specialties.service";
+import pick from "../../helper/pick";
 
 
 const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
@@ -20,13 +21,16 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 
-     const result = await SpecialtiesService.getAllFromDB();
+     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+
+     const result = await SpecialtiesService.getAllFromDB(options);
 
      sendResponse(res, {
           statusCode: StatusCode.OK,
           success: true,
-          message: 'Specialties data fetched successfully',
-          data: result,
+          message: "Specialties data fetched successfully",
+          meta: result.meta,
+          data: result.data,
      });
 });
 

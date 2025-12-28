@@ -3,7 +3,6 @@ import catchAsync from "../../shared/catchAsync";
 import pick from "../../helper/pick";
 import { patientFilterableFields } from "./patient.constant";
 import sendResponse from "../../shared/sendResponse";
-import { IJWTPayload } from "../../types/common";
 import StatusCode from "http-status-codes";
 import { PatientService } from "./patient.service";
 
@@ -50,11 +49,27 @@ const softDelete = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
-const updateIntoDB = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
 
-     const user = req.user;
-     const result = await PatientService.updateIntoDB(user as IJWTPayload, req.body);
-     
+const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
+
+     const { id } = req.params;
+     const result = await PatientService.deleteFromDB(id);
+
+     sendResponse(res, {
+          statusCode: StatusCode.OK,
+          success: true,
+          message: 'Patient deleted successfully',
+          data: result,
+     });
+});
+
+
+const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
+
+     const { id } = req.params;
+
+     const result = await PatientService.updateIntoDB(id, req.body);
+
      sendResponse(res, {
           statusCode: StatusCode.OK,
           success: true,
@@ -67,5 +82,6 @@ export const PatientController = {
      getAllFromDB,
      getByIdFromDB,
      softDelete,
-     updateIntoDB
+     updateIntoDB,
+     deleteFromDB
 };

@@ -5,6 +5,21 @@ import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
 import { ZodError } from "zod";
 
+
+// Sanitize error to prevent exposing sensitive information in production
+const sanitizeError = (error: any) => {
+
+     // Don't expose Prisma errors in production
+     if (process.env.NODE_ENV === "production" && error.code?.startsWith("P")) {
+     return {
+          message: "Database operation failed",
+          errorDetails: null,
+     };
+}
+     return error;
+};
+
+
 const globalErrorHandler = (
      err: any,
      req: Request,
@@ -106,14 +121,14 @@ const globalErrorHandler = (
 
 
 
+     // Sanitize error before sending response
+     const sanitizedError = sanitizeError(errors);
 
 
-
-
-res.status(statusCode).json({
-     success,
-     message,
-     errors 
+     res.status(statusCode).json({
+          success,
+          message,
+          sanitizedError
 });
 };
 

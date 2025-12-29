@@ -10,14 +10,14 @@ model Specialties {
 }
 
 model DoctorSpecialties {
-  specialitiesId    String
-  specialities      Specialties         @relation(fields: [specialitiesId], references: [id])
+  specialitiesId String
+  specialities   Specialties @relation(fields: [specialitiesId], references: [id])
 
   doctorId String
   doctor   Doctor @relation(fields: [doctorId], references: [id])
 
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime?             @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 
   @@id([specialitiesId, doctorId])
   @@map("doctor_specialties")

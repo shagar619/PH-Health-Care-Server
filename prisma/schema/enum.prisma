@@ -2,6 +2,7 @@ enum UserRole {
   PATIENT
   DOCTOR
   ADMIN
+  SUPER_ADMIN
 }
 
 enum UserStatus {
@@ -19,7 +20,7 @@ enum AppointmentStatus {
   SCHEDULED
   INPROGRESS
   COMPLETED
-  CANCEL
+  CANCELED
 }
 
 enum PaymentStatus {

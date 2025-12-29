@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import app from "./app";
+import seedSuperAdmin from "./app/helper/seed";
 import config from "./config";
 import { Server } from 'http';
 
@@ -8,12 +9,17 @@ async function bootstrap() {
      let server: Server;
 
      try {
+
+          // Seed super admin
+          await seedSuperAdmin();
+
           // Start the server
           server = app.listen(config.port, () => {
           console.log(`🚀 Server is running on http://localhost:${config.port}`);
           });
 
           // Function to gracefully shut down the server
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const exitHandler = () => {
           if (server) {
                server.close(() => {

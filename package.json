@@ -34,6 +34,7 @@
     "@openrouter/sdk": "^0.1.27",
     "@prisma/client": "^6.19.0",
     "@types/nodemailer": "^7.0.4",
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
     "cookie-parser": "^1.4.7",

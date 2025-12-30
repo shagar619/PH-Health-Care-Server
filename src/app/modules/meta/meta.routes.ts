@@ -8,7 +8,7 @@ const router = Router();
 
 router.get(
      '/',
-     auth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
      MetaController.fetchDashboardMetaData
 )
 

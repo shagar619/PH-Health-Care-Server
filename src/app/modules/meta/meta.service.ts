@@ -1,15 +1,15 @@
 import { PaymentStatus, UserRole } from "@prisma/client";
 import { prisma } from "../../shared/prisma";
-import { IJWTPayload } from "../../types/common";
 import ApiError from "../../errors/ApiError";
 import StatusCode from "http-status-codes";
+import { IAuthUser } from "../../interfaces/common";
 
 
-const fetchDashboardMetaData = async (user: IJWTPayload) => {
+const fetchDashboardMetaData = async (user: IAuthUser) => {
 
      let metadata;
 
-     switch (user.role) {
+     switch (user?.role) {
           case UserRole.ADMIN:
                metadata = await getAdminMetaData();
           break;
@@ -19,6 +19,9 @@ const fetchDashboardMetaData = async (user: IJWTPayload) => {
           case UserRole.PATIENT:
                metadata = await getPatientMetaData(user);
           break;
+          case UserRole.SUPER_ADMIN:
+               metadata = await getSuperAdminMetaData();
+          break;
           default:
                throw new ApiError(StatusCode.BAD_REQUEST, "Invalid user role!")
      }
@@ -26,8 +29,8 @@ const fetchDashboardMetaData = async (user: IJWTPayload) => {
 };
 
 
-const getDoctorMetaData = async (user: IJWTPayload) => {
-     
+const getDoctorMetaData = async (user: IAuthUser) => {
+
      const doctorData = await prisma.doctor.findUniqueOrThrow({
      where: {
           email: user?.email
@@ -89,7 +92,7 @@ const getDoctorMetaData = async (user: IJWTPayload) => {
 
 
 
-const getPatientMetaData = async (user: IJWTPayload) => {
+const getPatientMetaData = async (user: IAuthUser) => {
 
      const patientData = await prisma.patient.findUniqueOrThrow({
      where: {
@@ -140,10 +143,14 @@ const getPatientMetaData = async (user: IJWTPayload) => {
 const getAdminMetaData = async () => {
 
      const patientCount = await prisma.patient.count();
+
      const doctorCount = await prisma.doctor.count();
+
      const adminCount = await prisma.admin.count();
-     const appointmentCount = await prisma.appointment.count()
-     const paymentCount = await prisma.payment.count()
+
+     const appointmentCount = await prisma.appointment.count();
+
+     const paymentCount = await prisma.payment.count();
 
      const totalRevenue = await prisma.payment.aggregate({
      _sum: {
@@ -171,6 +178,43 @@ const getAdminMetaData = async () => {
 
 
 
+
+const getSuperAdminMetaData = async () => {
+
+     const appointmentCount = await prisma.appointment.count();
+
+     const patientCount = await prisma.patient.count();
+
+     const doctorCount = await prisma.doctor.count();
+
+     const adminCount = await prisma.admin.count();
+
+     const paymentCount = await prisma.payment.count();
+
+     const totalRevenue = await prisma.payment.aggregate({
+          _sum: { amount: true },
+          where: {
+               status: PaymentStatus.PAID
+          }
+     });
+
+     const barChartData = await getBarChartData();
+     const pieCharData = await getPieChartData();
+
+     return { 
+          appointmentCount, 
+          patientCount, 
+          doctorCount, 
+          adminCount, 
+          paymentCount, 
+          totalRevenue, 
+          barChartData, 
+          pieCharData 
+     }
+}
+
+
+
 const getBarChartData = async () => {
 
      const appointmentCountPerMonth = await prisma.$queryRaw`
@@ -192,12 +236,12 @@ const getPieChartData = async () => {
           _count: { id: true }
      });
 
-     const formatedAppointmentStatusDistribution = appointmentStatusDistribution.map(({ status, _count }) => ({
+     const formattedAppointmentStatusDistribution = appointmentStatusDistribution.map(({ status, _count }) => ({
           status,
           count: Number(_count.id)
      }));
 
-     return formatedAppointmentStatusDistribution;
+     return formattedAppointmentStatusDistribution;
 }
 
 

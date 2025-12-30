@@ -7,10 +7,14 @@ import { DoctorService } from "./doctor.service";
 import StatusCode from "http-status-codes";
 
 
+
+
+
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
-     const filters = pick(req.query, doctorFilterableFields)
+
+     const filters = pick(req.query, doctorFilterableFields);
 
      const result = await DoctorService.getAllFromDB(filters, options);
 
@@ -20,8 +24,11 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
           message: "Doctor fetched successfully!",
           meta: result.meta,
           data: result.data
-     })
+     });
 });
+
+
+
 
 
 const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
@@ -35,13 +42,17 @@ const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
           success: true,
           message: "Doctor updated successfully!",
           data: result
-     })
+     });
 });
+
+
+
 
 
 const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const { id } = req.params;
+
      const result = await DoctorService.getByIdFromDB(id);
 
      sendResponse(res, {
@@ -52,9 +63,14 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+
+
+
+
 const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const { id } = req.params;
+
      const result = await DoctorService.deleteFromDB(id);
 
      sendResponse(res, {
@@ -66,9 +82,13 @@ const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+
+
+
 const softDelete = catchAsync(async (req: Request, res: Response) => {
 
      const { id } = req.params;
+
      const result = await DoctorService.softDelete(id);
 
      sendResponse(res, {
@@ -85,7 +105,17 @@ const softDelete = catchAsync(async (req: Request, res: Response) => {
 
 const getAISuggestions = catchAsync(async (req: Request, res: Response) => {
 
-     const result = await DoctorService.getAISuggestions(req.body);
+     const { symptoms } = req.body;
+
+     // Basic validation
+     if (!symptoms || typeof symptoms !== 'string' || symptoms.trim().length < 5) {
+          return res.status(StatusCode.BAD_REQUEST).json({
+               success: false,
+               message: 'Please provide valid symptoms for doctor suggestion (minimum 5 characters).',
+          });
+     }
+
+     const result = await DoctorService.getAISuggestions({ symptoms: symptoms.trim() });
 
      sendResponse(res, {
           statusCode: 200,

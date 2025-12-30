@@ -1,6 +1,7 @@
 
 
-export const doctorFilterableFields: string[] = [    "name",
+export const doctorFilterableFields: string[] = [
+     "name",
      "email",
      "contactNumber",
      "address",

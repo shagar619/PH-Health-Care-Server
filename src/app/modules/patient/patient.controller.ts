@@ -7,6 +7,8 @@ import StatusCode from "http-status-codes";
 import { PatientService } from "./patient.service";
 
 
+
+
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const filters = pick(req.query, patientFilterableFields);
@@ -24,9 +26,13 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+
+
+
 const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const { id } = req.params;
+
      const result = await PatientService.getByIdFromDB(id);
 
      sendResponse(res, {
@@ -37,8 +43,13 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+
+
+
 const softDelete = catchAsync(async (req: Request, res: Response) => {
+
      const { id } = req.params;
+
      const result = await PatientService.softDelete(id);
 
      sendResponse(res, {
@@ -50,9 +61,13 @@ const softDelete = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+
+
+
 const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const { id } = req.params;
+
      const result = await PatientService.deleteFromDB(id);
 
      sendResponse(res, {
@@ -62,6 +77,9 @@ const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
           data: result,
      });
 });
+
+
+
 
 
 const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
@@ -77,6 +95,9 @@ const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
           data: result,
      });
 });
+
+
+
 
 export const PatientController = {
      getAllFromDB,

@@ -7,6 +7,9 @@ import { patientSearchableFields } from "./patient.constant";
 import { IPaginationOptions } from "../../interfaces/pagination";
 
 
+
+
+
 const getAllFromDB = async (
      filters: IPatientFilterRequest,
      options: IPaginationOptions,
@@ -98,6 +101,7 @@ const getAllFromDB = async (
 
 
 const getByIdFromDB = async (id: string): Promise<Patient | null> => {
+
      const result = await prisma.patient.findUnique({
      where: {
           id,
@@ -111,6 +115,9 @@ const getByIdFromDB = async (id: string): Promise<Patient | null> => {
 
      return result;
 };
+
+
+
 
 
 const softDelete = async (id: string): Promise<Patient | null> => {

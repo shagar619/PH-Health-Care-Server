@@ -3,12 +3,12 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../../errors/ApiError";
 import { IOptions, paginationHelper } from "../../helper/paginationHelper";
 import { prisma } from "../../shared/prisma";
-import { IJWTPayload } from "../../types/common";
 import { Prisma } from "@prisma/client";
+import { IAuthUser } from "../../interfaces/common";
 
 
 
-const insertIntoDB = async (user: IJWTPayload, payload: {
+const insertIntoDB = async (user: any, payload: {
      scheduleIds: string[]
 }) => {
 
@@ -21,7 +21,7 @@ const insertIntoDB = async (user: IJWTPayload, payload: {
      const doctorScheduleData = payload.scheduleIds.map(scheduleId => ({
           doctorId: doctorData.id,
           scheduleId
-     }))
+     }));
 
      return await prisma.doctorSchedules.createMany({
           data: doctorScheduleData
@@ -30,14 +30,17 @@ const insertIntoDB = async (user: IJWTPayload, payload: {
 
 
 
+
+
 const getMySchedule = async (
      filters: any,
      options: IOptions,
      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-     user: IJWTPayload
+     user: IAuthUser
 ) => {
 
      const { limit, page, skip } = paginationHelper.calculatePagination(options);
+
      const { startDate, endDate, ...filterData } = filters;
 
      const andConditions = [];
@@ -104,7 +107,7 @@ const getMySchedule = async (
 
      return {
      meta: {
-     total,
+          total,
           page,
           limit,
      },
@@ -114,7 +117,7 @@ const getMySchedule = async (
 
 
 
-const deleteFromDB = async (user: IJWTPayload, scheduleId: string) => {
+const deleteFromDB = async (user: IAuthUser, scheduleId: string) => {
 
      const doctorData = await prisma.doctor.findUniqueOrThrow({
      where: {
@@ -147,13 +150,17 @@ const deleteFromDB = async (user: IJWTPayload, scheduleId: string) => {
 
 
 
+
+
 const getAllFromDB = async (
      filters: any,
      options: IOptions,
 ) => {
 
      const { limit, page, skip } = paginationHelper.calculatePagination(options);
+
      const { searchTerm, ...filterData } = filters;
+
      const andConditions = [];
 
      if (searchTerm) {
@@ -184,6 +191,7 @@ const getAllFromDB = async (
 
      const whereConditions: any =
      andConditions.length > 0 ? { AND: andConditions } : {};
+
      const result = await prisma.doctorSchedules.findMany({
      include: {
           doctor: true,
@@ -197,6 +205,7 @@ const getAllFromDB = async (
                ? { [options.sortBy]: options.sortOrder }
                : {},
      });
+
      const total = await prisma.doctorSchedules.count({
           where: whereConditions,
      });

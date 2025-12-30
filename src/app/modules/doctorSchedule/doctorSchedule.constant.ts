@@ -1,3 +1,7 @@
 
 
-export const scheduleFilterableFields: string[] = ['searchTerm', 'isBooked', 'doctorId'];
+export const scheduleFilterableFields: string[] = [
+     'searchTerm', 
+     'isBooked', 
+     'doctorId'
+];

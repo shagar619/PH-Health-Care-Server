@@ -15,7 +15,9 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
 
-     const result = await PatientService.getAllFromDB(filters, options);
+     const includeHealthData = req.query.includeHealthData === 'true';
+
+     const result = await PatientService.getAllFromDB(filters, options, includeHealthData);
 
      sendResponse(res, {
           statusCode: StatusCode.OK,

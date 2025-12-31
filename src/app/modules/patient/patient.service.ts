@@ -55,11 +55,11 @@ const getAllFromDB = async (
     // Conditional include based on parameter
      const includeClause = includeHealthData
      ? {
-          medicalReport: true,
+          medicalReports: true,
           patientHealthData: true,
      }
      : {
-     medicalReport: {
+     medicalReports: {
           select: {
                id: true,
                reportName: true,

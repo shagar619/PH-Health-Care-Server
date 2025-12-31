@@ -7,6 +7,8 @@ import { paginationHelper } from "../../helper/paginationHelper";
 
 
 
+
+
 const insertIntoDB = async (req: Request) => {
 
      const file = req.file;
@@ -25,6 +27,7 @@ const insertIntoDB = async (req: Request) => {
 
 
 
+
 const getAllFromDB = async (options: IPaginationOptions) => {
 
      const { limit, page, skip } = paginationHelper.calculatePagination(options);
@@ -35,7 +38,7 @@ const getAllFromDB = async (options: IPaginationOptions) => {
           orderBy:
           options.sortBy && options.sortOrder
                ? { [options.sortBy]: options.sortOrder }
-               : { id: "desc" },
+               : { createdAt: "desc" },
      });
 
      const total = await prisma.specialties.count();
@@ -49,6 +52,8 @@ const getAllFromDB = async (options: IPaginationOptions) => {
      data: result,
      };
 };
+
+
 
 
 const deleteFromDB = async (id: string): Promise<Specialties> => {

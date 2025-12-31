@@ -6,6 +6,8 @@ import { SpecialtiesService } from "./specialties.service";
 import pick from "../../helper/pick";
 
 
+
+
 const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
 
      const result = await SpecialtiesService.insertIntoDB(req);
@@ -17,6 +19,8 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
           data: result
      });
 });
+
+
 
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
@@ -35,9 +39,12 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+
+
 const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const { id } = req.params;
+
      const result = await SpecialtiesService.deleteFromDB(id);
 
      sendResponse(res, {
@@ -47,6 +54,9 @@ const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
           data: result,
      });
 });
+
+
+
 
 export const SpecialtiesController = {
      insertIntoDB,

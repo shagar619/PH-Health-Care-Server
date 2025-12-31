@@ -6,6 +6,7 @@ import { UserRole } from "@prisma/client";
 import { SpecialtiesController } from "./specialties.controller";
 
 
+
 const router = Router();
 
 
@@ -22,6 +23,7 @@ router.get(
      '/',
      SpecialtiesController.getAllFromDB
 );
+
 
 router.post(
      '/',
@@ -46,8 +48,10 @@ router.post(
 
 router.delete(
      '/:id',
-     auth(UserRole.ADMIN, UserRole.ADMIN),
+     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
      SpecialtiesController.deleteFromDB
 );
+
+
 
 export const SpecialtiesRoutes = router;

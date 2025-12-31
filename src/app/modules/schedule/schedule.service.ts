@@ -9,11 +9,16 @@ import { IPaginationOptions } from "../../interfaces/pagination";
 import { IAuthUser } from "../../interfaces/common";
 
 
-const convertDateTime = async (date: Date) => {
-     const offset = date.getTimezoneOffset() * 60000;
 
+
+
+
+const convertDateTime = async (date: Date) => {
+
+     const offset = date.getTimezoneOffset() * 60000;
      return new Date(date.getTime() + offset);
 }
+
 
 
 const insertIntoDB = async (payload: ISchedule): Promise<Schedule[]> => {
@@ -89,6 +94,7 @@ const insertIntoDB = async (payload: ISchedule): Promise<Schedule[]> => {
 
 
 
+
 const getAllFromDB = async (
      filters: IFilterRequest,
      options: IPaginationOptions,
@@ -158,7 +164,7 @@ const getAllFromDB = async (
 }
 
      const whereConditions: Prisma.ScheduleWhereInput =
-          andConditions.length > 0 ? { AND: andConditions } : {};
+     andConditions.length > 0 ? { AND: andConditions } : {};
 
      const doctorSchedules = await prisma.doctorSchedules.findMany({
           where: {
@@ -292,6 +298,8 @@ const schedulesForDoctor = async (
 
 
 
+
+
 const getByIdFromDB = async (id: string): Promise<Schedule | null> => {
 
      const result = await prisma.schedule.findUnique({
@@ -305,15 +313,16 @@ const getByIdFromDB = async (id: string): Promise<Schedule | null> => {
 
 
 
+
+
 const deleteScheduleFromDB = async (id: string) => {
 
      return await prisma.schedule.delete({
      where: {
           id
      }
-     })
+     });
 }
-
 
 
 

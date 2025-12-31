@@ -8,6 +8,9 @@ import { IJWTPayload } from "../../types/common";
 import { IAuthUser } from "../../interfaces/common";
 
 
+
+
+
 const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
 
      const result = await ScheduleService.insertIntoDB(req.body);
@@ -19,6 +22,9 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
           data: result
      })
 });
+
+
+
 
 
 const getAllFromDB = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
@@ -42,6 +48,8 @@ const getAllFromDB = catchAsync(async (req: Request & { user?: IAuthUser }, res:
 
 
 
+
+
 const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const { id } = req.params;
@@ -54,6 +62,8 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
           data: result,
      });
 });
+
+
 
 
 

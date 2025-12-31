@@ -4,11 +4,14 @@ import { UserRole } from "@prisma/client";
 import auth from "../../middlewares/auth";
 
 
+
 const router = Router();
+
+
 
 router.get(
      '/',
-     auth(UserRole.DOCTOR, UserRole.ADMIN),
+     auth(UserRole.DOCTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN),
      ScheduleController.getAllFromDB
 );
 
@@ -36,14 +39,15 @@ router.post(
      "/",
      auth(UserRole.ADMIN),
      ScheduleController.insertIntoDB
-)
+);
 
 
 router.delete(
      "/:id",
-     // auth(UserRole.ADMIN),
+     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
      ScheduleController.deleteScheduleFromDB
-)
+);
+
 
 /**
  * API ENDPOINT: /schedule/:id

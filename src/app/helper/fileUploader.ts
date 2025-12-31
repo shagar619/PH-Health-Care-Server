@@ -1,7 +1,10 @@
+/* eslint-disable no-console */
 import multer from 'multer';
 import path from 'path';
 import { v2 as cloudinary } from 'cloudinary';
 import config from '../../config';
+
+
 
 const storage = multer.diskStorage({
      destination: function (req, file, cb) {

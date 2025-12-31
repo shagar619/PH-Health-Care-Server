@@ -3,9 +3,10 @@ import catchAsync from "../../shared/catchAsync";
 import pick from "../../helper/pick";
 import { patientFilterableFields } from "./patient.constant";
 import sendResponse from "../../shared/sendResponse";
-import { IJWTPayload } from "../../types/common";
 import StatusCode from "http-status-codes";
 import { PatientService } from "./patient.service";
+
+
 
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
@@ -14,7 +15,9 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
 
-     const result = await PatientService.getAllFromDB(filters, options);
+     const includeHealthData = req.query.includeHealthData === 'true';
+
+     const result = await PatientService.getAllFromDB(filters, options, includeHealthData);
 
      sendResponse(res, {
           statusCode: StatusCode.OK,
@@ -25,9 +28,13 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+
+
+
 const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
 
      const { id } = req.params;
+
      const result = await PatientService.getByIdFromDB(id);
 
      sendResponse(res, {
@@ -38,8 +45,13 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+
+
+
 const softDelete = catchAsync(async (req: Request, res: Response) => {
+
      const { id } = req.params;
+
      const result = await PatientService.softDelete(id);
 
      sendResponse(res, {
@@ -50,11 +62,34 @@ const softDelete = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
-const updateIntoDB = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
 
-     const user = req.user;
-     const result = await PatientService.updateIntoDB(user as IJWTPayload, req.body);
-     
+
+
+
+const deleteFromDB = catchAsync(async (req: Request, res: Response) => {
+
+     const { id } = req.params;
+
+     const result = await PatientService.deleteFromDB(id);
+
+     sendResponse(res, {
+          statusCode: StatusCode.OK,
+          success: true,
+          message: 'Patient deleted successfully',
+          data: result,
+     });
+});
+
+
+
+
+
+const updateIntoDB = catchAsync(async (req: Request, res: Response) => {
+
+     const { id } = req.params;
+
+     const result = await PatientService.updateIntoDB(id, req.body);
+
      sendResponse(res, {
           statusCode: StatusCode.OK,
           success: true,
@@ -63,9 +98,13 @@ const updateIntoDB = catchAsync(async (req: Request & { user?: IJWTPayload }, re
      });
 });
 
+
+
+
 export const PatientController = {
      getAllFromDB,
      getByIdFromDB,
      softDelete,
-     updateIntoDB
+     updateIntoDB,
+     deleteFromDB
 };

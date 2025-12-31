@@ -4,7 +4,10 @@ import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
 
 
+
 const router = Router();
+
+
 
 router.get(
      '/',
@@ -23,8 +26,15 @@ router.patch(
 );
 
 router.delete(
+     '/:id',
+     PatientController.deleteFromDB
+);
+
+router.delete(
      '/soft/:id',
      PatientController.softDelete
 );
+
+
 
 export const PatientRoutes = router;

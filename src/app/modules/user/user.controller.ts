@@ -5,7 +5,7 @@ import { UserService } from "./user.service";
 import StatusCodes from "http-status-codes";
 import pick from "../../helper/pick";
 import { userFilterableFields } from "./user.constant";
-import { IJWTPayload } from "../../types/common";
+import { IAuthUser } from "../../interfaces/common";
 
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
@@ -17,19 +17,20 @@ const createPatient = catchAsync(async (req: Request, res: Response) => {
           success: true,
           message: "Patient created successfully!",
           data: result
-     })
+     });
 });
 
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
 
      const result = await UserService.createAdmin(req);
+
      sendResponse(res, {
           statusCode: StatusCodes.CREATED,
           success: true,
           message: "Admin Created successfully!",
           data: result
-     })
+     });
 });
 
 
@@ -42,7 +43,7 @@ const createDoctor = catchAsync(async (req: Request, res: Response) => {
           success: true,
           message: "Doctor Created successfully!",
           data: result
-     })
+     });
 });
 
 
@@ -60,23 +61,23 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
           success: true,
           message: "Users retrieved successfully!",
           data: result
-     })
+     });
 });
 
 
 
-const getMyProfile = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
+const getMyProfile = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
 
      const user = req.user;
 
-     const result = await UserService.getMyProfile(user as IJWTPayload);
+     const result = await UserService.getMyProfile(user as IAuthUser);
 
      sendResponse(res, {
           statusCode: StatusCodes.OK,
           success: true,
           message: "My profile data fetched!",
           data: result
-     })
+     });
 });
 
 
@@ -97,11 +98,11 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
 
 
 
-const updateMyProfile = catchAsync(async (req: Request & { user?: IJWTPayload }, res: Response) => {
+const updateMyProfile = catchAsync(async (req: Request & { user?: IAuthUser }, res: Response) => {
 
      const user = req.user;
 
-     const result = await UserService.updateMyProfile(user as IJWTPayload, req);
+     const result = await UserService.updateMyProfile(user as IAuthUser, req);
 
      sendResponse(res, {
           statusCode: StatusCodes.OK,

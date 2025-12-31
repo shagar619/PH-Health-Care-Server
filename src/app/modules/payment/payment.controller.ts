@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
@@ -11,7 +12,12 @@ const handleStripeWebhookEvent = catchAsync(async (req: Request, res: Response) 
 
      const sig = req.headers["stripe-signature"] as string;
 
-     const webhookSecret = "whsec_e7938d64357460726e3698bdc70cb5f4d37598f1ceb5b0306bccddddb6425af6"
+     const webhookSecret = "whsec_e7938d64357460726e3698bdc70cb5f4d37598f1ceb5b0306bccddddb6425af6";
+
+     if (!webhookSecret) {
+          console.error("⚠️ Stripe webhook secret not configured");
+          return res.status(500).send("Webhook secret not configured");
+     }
 
      let event;
      try {
@@ -22,7 +28,8 @@ const handleStripeWebhookEvent = catchAsync(async (req: Request, res: Response) 
           return res.status(400).send(`Webhook Error: ${err.message}`);
      }
 
-     const result = await PaymentService.handleStripeWebhookEvent(event);
+     try {
+               const result = await PaymentService.handleStripeWebhookEvent(event);
 
      sendResponse(res, {
           statusCode: StatusCode.OK,
@@ -30,6 +37,17 @@ const handleStripeWebhookEvent = catchAsync(async (req: Request, res: Response) 
           message: 'Webhook req send successfully',
           data: result,
      });
+     } catch (error: any) {
+          console.error("❌ Error processing webhook:", error);
+          // Still return 200 to acknowledge receipt to Stripe
+          // Stripe will retry if we return an error
+          sendResponse(res, {
+               statusCode: 200,
+               success: true,
+               message: 'Webhook received but processing failed',
+               data: { error: error.message },
+          });
+     }
 });
 
 export const PaymentController = {

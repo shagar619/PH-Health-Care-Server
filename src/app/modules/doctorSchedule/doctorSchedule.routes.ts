@@ -6,11 +6,21 @@ import validateRequest from "../../middlewares/validateRequest";
 import { DoctorScheduleValidation } from "./doctorSchedule.validation";
 
 
+
+
 const router = Router();
+
+
+/**
+ * API ENDPOINT: /doctor-schedule/
+ * 
+ * Get all doctor schedule with filtering
+ */
+
 
 router.get(
      '/',
-     auth(UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+     auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
      DoctorScheduleController.getAllFromDB
 );
 

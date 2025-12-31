@@ -3,37 +3,10 @@ import bcrypt from "bcryptjs";
 import { prisma } from "../../shared/prisma";
 import { Request } from "express";
 import { fileUploader } from "../../helper/fileUploader";
-import { Admin, Doctor, Prisma, UserRole, UserStatus } from "@prisma/client";
+import { Admin, Doctor, Patient, Prisma, UserRole, UserStatus } from "@prisma/client";
 import { IOptions, paginationHelper } from "../../helper/paginationHelper";
 import { userSearchableFields } from "./user.constant";
-import { IJWTPayload } from "../../types/common";
-
-const createPatient = async (req: Request) => {
-
-     if (req.file) {
-
-     const uploadResult = await fileUploader.uploadToCloudinary(req.file);
-
-     req.body.patient.profilePhoto = uploadResult?.secure_url
-     }
-
-     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
-     const result = await prisma.$transaction(async (tnx) => {
-     await tnx.user.create({
-          data: {
-               email: req.body.patient.email,
-               password: hashedPassword
-          }
-     });
-
-     return await tnx.patient.create({
-          data: req.body.patient
-     })
-     });
-     
-     return result;
-}
+import { IAuthUser } from "../../interfaces/common";
 
 
 
@@ -92,18 +65,72 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
           email: req.body.doctor.email,
           password: hashedPassword,
           role: UserRole.DOCTOR
-     }
+     };
+
+     // Extract specialties from doctor data
+     const { specialties, ...doctorData } = req.body.doctor;
 
      const result = await prisma.$transaction(async (transactionClient) => {
+          // Step 1: Create user
           await transactionClient.user.create({
                data: userData
      });
 
+     // Step 2: Create doctor
      const createdDoctorData = await transactionClient.doctor.create({
-          data: req.body.doctor
+          data: doctorData
      });
 
-     return createdDoctorData;
+     // Step 3: Create doctor specialties if provided
+     if (specialties && Array.isArray(specialties) && specialties.length > 0) {
+          // Verify all specialties exist
+          const existingSpecialties = await transactionClient.specialties.findMany({
+               where: {
+                    id: {
+                         in: specialties
+                    }
+               },
+               select: {
+                    id: true
+               }
+          });
+
+          const existingSpecialtyIds = existingSpecialties.map((s) => s.id);
+
+          const invalidSpecialties = specialties.filter((id) => !existingSpecialtyIds.includes(id));
+
+          if (invalidSpecialties.length > 0) {
+               throw new Error(
+                    `Invalid specialty IDs: ${invalidSpecialties.join(", ")}`
+               );
+          }
+
+          // Create doctor specialties relations
+          const doctorSpecialtiesData = specialties.map((specialtyId) => ({
+               doctorId: createdDoctorData.id,
+               specialitiesId: specialtyId
+          }));
+
+          await transactionClient.doctorSpecialties.createMany({
+               data: doctorSpecialtiesData,
+          });
+     }
+
+     // Step 4: Return doctor with specialties
+     const doctorWithSpecialties = await transactionClient.doctor.findUnique({
+          where: {
+               id: createdDoctorData.id
+          },
+          include: {
+               doctorSpecialties: {
+                    include: {
+                         specialities: true
+                    }
+               }
+          }
+     });
+
+     return doctorWithSpecialties!;
 });
 
      return result;
@@ -111,15 +138,57 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
 
 
 
+
+
+
+const createPatient = async (req: Request): Promise<Patient> => {
+
+     const file = req.file;
+
+     if (file) {
+
+     const uploadResult = await fileUploader.uploadToCloudinary(file);
+
+     req.body.patient.profilePhoto = uploadResult?.secure_url
+     }
+
+     const hashedPassword: string = await bcrypt.hash(req.body.password, 10);
+
+     const userData = {
+          email: req.body.patient.email,
+          password: hashedPassword,
+          role: UserRole.PATIENT
+     }
+
+     const result = await prisma.$transaction(async (tnx) => {
+     await tnx.user.create({
+          data: {
+               ...userData,
+               needPasswordChange: false
+          }
+     });
+
+     return await tnx.patient.create({
+          data: req.body.patient
+     })
+     });
+     
+     return result;
+}
+
+
+
+
+
 const getAllFromDB = async (params: any, options: IOptions) => {
 
-     const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options)
+     const { page, limit, skip } = paginationHelper.calculatePagination(options)
 
      const { searchTerm, ...filterData } = params;
 
      const andConditions: Prisma.UserWhereInput[] = [];
 
-     if (searchTerm) {
+     if (params.searchTerm) {
      andConditions.push({
           OR: userSearchableFields.map(field => ({
                [field]: {
@@ -148,8 +217,22 @@ const getAllFromDB = async (params: any, options: IOptions) => {
           skip,
           take: limit,
           where: whereConditions,
-          orderBy: {
-               [sortBy]: sortOrder
+          orderBy: options.sortBy && options.sortOrder ? {
+               [options.sortBy]: options.sortOrder
+          } : {
+               createdAt: 'desc'
+          },
+          select: {
+               id: true,
+               email: true,
+               role: true,
+               needPasswordChange: true,
+               status: true,
+               createdAt: true,
+               updatedAt: true,
+               admin: true,
+               patient: true,
+               doctor: true
           }
      });
 
@@ -170,11 +253,11 @@ const getAllFromDB = async (params: any, options: IOptions) => {
 
 
 
-const getMyProfile = async (user: IJWTPayload) => {
+const getMyProfile = async (user: IAuthUser) => {
 
      const userInfo = await prisma.user.findUniqueOrThrow({
      where: {
-          email: user.email,
+          email: user?.email,
           status: UserStatus.ACTIVE
      },
      select: {
@@ -188,10 +271,49 @@ const getMyProfile = async (user: IJWTPayload) => {
 
      let profileData;
 
-     if (userInfo.role === UserRole.PATIENT) {
+     if (userInfo.role === UserRole.ADMIN) {
+     profileData = await prisma.admin.findUnique({
+          where: {
+               email: userInfo.email
+          },
+          select: {
+               id: true,
+               name: true,
+               email: true,
+               profilePhoto: true,
+               contactNumber: true,
+               isDeleted: true,
+               createdAt: true,
+               updatedAt: true,
+          }
+     })
+     }
+     else if (userInfo.role === UserRole.PATIENT) {
      profileData = await prisma.patient.findUnique({
           where: {
                email: userInfo.email
+          },
+          select: {
+               id: true,
+               name: true,
+               email: true,
+               profilePhoto: true,
+               contactNumber: true,
+               address: true,
+               isDeleted: true,
+               createdAt: true,
+               updatedAt: true,
+               patientHealthData: true,
+               medicalReports: {
+                    select: {
+                         id: true,
+                         patientId: true,
+                         reportName: true,
+                         reportLink: true,
+                         createdAt: true,
+                         updatedAt: true,
+                    },
+               },
           }
      })
      }
@@ -199,16 +321,34 @@ const getMyProfile = async (user: IJWTPayload) => {
      profileData = await prisma.doctor.findUnique({
           where: {
                email: userInfo.email
+          },
+          select: {
+               id: true,
+               name: true,
+               email: true,
+               profilePhoto: true,
+               contactNumber: true,
+               address: true,
+               registrationNumber: true,
+               experience: true,
+               gender: true,
+               appointmentFee: true,
+               qualification: true,
+               currentWorkingPlace: true,
+               designation: true,
+               averageRating: true,
+               isDeleted: true,
+               createdAt: true,
+               updatedAt: true,
+               doctorSpecialties: {
+                    include: {
+                         specialities: true
+               }
           }
+     },
      })
      }
-     else if (userInfo.role === UserRole.ADMIN) {
-     profileData = await prisma.admin.findUnique({
-          where: {
-               email: userInfo.email
-          }
-     })
-     }
+
 
      return {
           ...userInfo,
@@ -219,27 +359,27 @@ const getMyProfile = async (user: IJWTPayload) => {
 
 
 
-const changeProfileStatus = async (id: string, payload: { status: UserStatus }) => {
+const changeProfileStatus = async (id: string, status: UserRole) => {
 
      await prisma.user.findUniqueOrThrow({
      where: {
           id
      }
-     })
+     });
 
      const updateUserStatus = await prisma.user.update({
      where: {
           id
      },
-     data: payload
-     })
+     data: status
+     });
 
      return updateUserStatus;
 };
 
 
 
-const updateMyProfile = async (user: IJWTPayload, req: Request) => {
+const updateMyProfile = async (user: IAuthUser, req: Request) => {
 
      const userInfo = await prisma.user.findUniqueOrThrow({
      where: {

@@ -356,50 +356,51 @@ type PatientInput = {
 
 // Implementing AI-Driven Doctor Suggestion
 const getAISuggestions = async (input: PatientInput) => {
+
      // Fetch all active doctors with their specialties and ratings
-  const doctors = await prisma.doctor.findMany({
-    where: { isDeleted: false },
-    include: {
-      doctorSpecialties: {
-        include: { specialities: true },
-      },
-      review: { select: { rating: true } },
-    },
-  });
+     const doctors = await prisma.doctor.findMany({
+     where: { isDeleted: false },
+     include: {
+          doctorSpecialties: {
+          include: { specialities: true },
+     },
+     reviews: { select: { rating: true } },
+     },
+     });
 
-  if (doctors.length === 0) {
-    return [];
-  }
+     if (doctors.length === 0) {
+     return [];
+     }
 
-  // Transform doctors data to include calculated average ratings and all specialties
-  const doctorsWithRatings = doctors.map((doctor: any) => {
-    const allSpecialties = doctor.doctorSpecialties
-      .map((ds: any) => ds.specialities?.title)
-      .filter(Boolean);
+     // Transform doctors data to include calculated average ratings and all specialties
+     const doctorsWithRatings = doctors.map((doctor: any) => {
+     const allSpecialties = doctor.doctorSpecialties
+     .map((ds: any) => ds.specialities?.title)
+     .filter(Boolean);
 
-    return {
-      id: doctor.id,
-      name: doctor.name,
-      email: doctor.email,
-      profilePhoto: doctor.profilePhoto,
-      contactNumber: doctor.contactNumber,
-      address: doctor.address,
-      registrationNumber: doctor.registrationNumber,
-      experience: doctor.experience,
-      gender: doctor.gender,
-      appointmentFee: doctor.appointmentFee,
-      qualification: doctor.qualification,
-      currentWorkingPlace: doctor.currentWorkingPlace,
-      designation: doctor.designation,
-      averageRating: doctor.review && doctor.review.length > 0
-        ? doctor.review.reduce((sum: number, r: any) => sum + r.rating, 0) / doctor.review.length
-        : 0,
-      specialties: allSpecialties, // Array of all specialties
-      primarySpecialty: allSpecialties[0] || 'General', // For backward compatibility
-    };
-  });
+     return {
+     id: doctor.id,
+     name: doctor.name,
+     email: doctor.email,
+     profilePhoto: doctor.profilePhoto,
+     contactNumber: doctor.contactNumber,
+     address: doctor.address,
+     registrationNumber: doctor.registrationNumber,
+     experience: doctor.experience,
+     gender: doctor.gender,
+     appointmentFee: doctor.appointmentFee,
+     qualification: doctor.qualification,
+     currentWorkingPlace: doctor.currentWorkingPlace,
+     designation: doctor.designation,
+     averageRating: doctor.review && doctor.review.length > 0
+     ? doctor.review.reduce((sum: number, r: any) => sum + r.rating, 0) / doctor.review.length
+     : 0,
+     specialties: allSpecialties, // Array of all specialties
+     primarySpecialty: allSpecialties[0] || 'General', // For backward compatibility
+     };
+     });
 
-  const systemMessage = {
+     const systemMessage = {
      role: "system",
      content:
           "You are an expert medical recommendation assistant. Analyze patient symptoms and match them to the most appropriate medical specialty, then recommend suitable doctors. Be very precise in specialty matching - for example: headaches/brain issues → Neurology, chest pain/heart issues → Cardiology, kidney issues → Neurology, etc.",

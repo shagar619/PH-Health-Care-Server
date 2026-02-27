@@ -99,7 +99,7 @@ const getAllFromDB = async (
 
 
 
-
+// get single patient with health data and medical reports
 const getByIdFromDB = async (id: string): Promise<Patient | null> => {
 
      const result = await prisma.patient.findUnique({

@@ -1,4 +1,4 @@
-# !/user/bin/env bash
+#!/usr/bin/env bash
 # Build the TypeScript code
 # set on error
 set -o errexit
